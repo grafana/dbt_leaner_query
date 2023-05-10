@@ -41,7 +41,7 @@ leaner_query_custom_egress_emails: [
 'another_sa@your-project.iam.gserviceaccount.com',
 ]  
 ```
-- Optionally update the dataset where the leaner_query models will be built (defaults to `leaner-query`):
+- Optionally update your dbt_project.yml file to override the dataset where the leaner_query models will be built (defaults to `leaner-query`):
 ```YML
 leaner_query:
     +schema: leaner_query_output
