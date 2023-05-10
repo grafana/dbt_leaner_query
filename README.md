@@ -4,7 +4,7 @@ This is a dbt package built to help teams that use BigQuery understand their cos
 
 This package uses [BigQuery Audit](https://cloud.google.com/logging/docs/reference/audit/bigquery/rest/Shared.Types/AuditData) Log data and assumes that a log sink is set up to export the logs into tables in a BigQuery dataset.  If you are unfamiliar with how to accomplish this, visit this Google cloud [resource](https://cloud.google.com/blog/products/data-analytics/bigquery-audit-logs-pipelines-analysis).
 
-This package assumes that the user(s) executing the processes have read access to the log dataset referenced above.
+This package assumes that the user(s) executing the processes have read access to the bigquery log dataset referenced above and write access to the dataset where leaner_query is creating/updating objects.
 
 The package contains a lot of variable values to determine costs, aggregation, and scoring.  You will want to override/specify some of these values in your dbt_project.yml file as your details and use cases are undoubtedly different than ours.  More details in the [variables](#variables) section.
 
@@ -14,11 +14,42 @@ This dbt package aims to provide the following details for data teams who are us
 - easy categorization and classification of your dbt models through a scoring system that assigns an **importance**, **threat**, and **overall priority** score per model.
 
 ## Quick Links
+- **[Getting Started](#getting-started)**
 - **[Models](#models)**
 - **[Reports](#reports)**
 - **[Scoring logic](#scoring-logic)**
 - **[Variables](#variables)**
 
+
+## Getting Started
+- Add any/all variable overrides to your dbt_project.yml file, ie:
+```YML
+leaner_query_database: my_gcp_project
+leaner_query_importance_query_score_3: ['My BI Tool']
+leaner_query_importance_query_score_4: ['My reverse ETL tool']
+
+leaner_query_prod_dataset_names: ['marts','reports']
+leaner_query_stage_dataset_names: ['staging_models']
+
+leaner_query_custom_clients: [
+	{'user_agent': 'agent_string', 'principal_email':'username', 'client_name':'Custom Client 1'},
+	{'user_agent': 'agent_string', 'principal_email':'different_username', 'client_name':'Custom Client 2'},
+]
+  
+leaner_query_custom_egress_emails: [
+'egress_sa@your-project.iam.gserviceaccount.com',
+'another_sa@your-project.iam.gserviceaccount.com',
+]  
+```
+- Optionally update the dataset where the leaner_query models will be built (defaults to `leaner-query`):
+```YML
+leaner_query:
+    +schema: leaner_query_output
+```
+- Run via tag:
+```
+	dbt run -s tag:leaner_query
+```
 
 ### Models
 The package outputs a dimensional model that allows users to build upon for custom analysis and reporting.  This dimensional model contains:
@@ -113,6 +144,15 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 ``` 
 ## Variables
 ### General purpose
+- **leaner_query_database** 
+	- **Description**: database (project) where the bigquery audit logs reside.
+	- **Default**: target.database
+- **leaner_query_source_schema** 
+	- **Description**: schema (dataset) where the bigquery audit logs reside.
+	- **Default**: bigquery_audit_logs
+- **leaner_query_data_access_table** 
+	- **Description**: tablename where the bigquery data access audit logs reside.
+	- **Default**: leaner_query_data_access_table
 - **leaner_query_enable_reports** 
 	- **Description**: enable report models listed above.
 	- **Default**: true
