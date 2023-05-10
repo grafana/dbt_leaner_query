@@ -32,8 +32,8 @@ leaner_query_prod_dataset_names: ['marts','reports']
 leaner_query_stage_dataset_names: ['staging_models']
 
 leaner_query_custom_clients: [
-	{'user_agent': 'agent_string', 'principal_email':'username', 'client_name':'Custom Client 1'},
-	{'user_agent': 'agent_string', 'principal_email':'different_username', 'client_name':'Custom Client 2'},
+{'user_agent': 'agent_string', 'principal_email':'username', 'client_name':'Custom Client 1'},
+{'user_agent': 'agent_string', 'principal_email':'different_username', 'client_name':'Custom Client 2'},
 ]
   
 leaner_query_custom_egress_emails: [
