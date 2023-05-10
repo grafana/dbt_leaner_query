@@ -1,0 +1,16 @@
+# dbt folders
+target/
+dbt_modules/
+dbt_packages/
+logs/
+
+# vscode folders
+.vscode/
+
+#virtual env
+.venv/
+
+#ds_Store files
+.DS_Store
+
+.user.yml

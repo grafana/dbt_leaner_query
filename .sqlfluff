@@ -1,0 +1,37 @@
+[sqlfluff]
+templater = dbt
+dialect = bigquery
+large_file_skip_byte_limit = 0
+runaway_limit = 20
+rules = L001, L002, L003, L004, L006, L009, L010, L011, L017, L018, L019, L022, L030, L032, L036, L039, L040, L041, L042, L046, L048, L049, L051, L060, L061, L065
+
+[sqlfluff:rules]
+tab_space_size = 4
+indent_unit = space
+capitalisation_policy = lower
+
+[sqlfluff:indentation]
+template_blocks_indent = false
+
+[sqlfluff:rules:L011]
+# aliasing
+aliasing = explicit
+
+[sqlfluff:rules:L036]
+wildcard_policy = single
+
+[sqlfluff:rules:L040]
+# Null & Boolean Literals
+capitalisation_policy = consistent
+# Comma separated list of words to ignore for this rule
+ignore_words = None
+ignore_words_regex = None
+
+[sqlfluff:rules:L042]
+forbid_subquery_in = both
+
+[sqlfluff:rules:L051]
+fully_qualify_join_types = both
+
+[tool.sqlfluff.templater.jinja]
+apply_dbt_builtins = true

@@ -1,0 +1,7 @@
+# Eventually it would be preferrable to have a specific version to ensure
+# that we're all in sync and are preventing dependency pain
+
+dbt-bigquery==1.3.0
+sqlfluff==1.4.2
+sqlfluff-templater-dbt==1.4.2
+diff-cover==7.2.0

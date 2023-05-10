@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: rpt_bigquery_user_metrics_daily
+    description: >
+      Aggregates queries run, errors, types of tables ran, cost, and execution
+      time by each user and user_type on a daily grain.
+
+  - name: rpt_bigquery_usage_cost_daily
+    description: >
+      Aggregates queries run, cost, dbt build/test cost, and execution time
+      by client_type on a daily grain.
+
+  - name: rpt_bigquery_table_usage_daily
+    description: >
+      Incremental model aggregating the number of queries run split by 
+      user_type and execution_type at a grain of day, table, layer and client_type.
+
+  - name: rpt_bigquery_query_alerting
+    description: Model used for Grafana alerting on specific queries.
+
+  - name: rpt_bigquery_dbt_metrics_daily
+    description: >
+      Aggregates dbt costs and build times for each table, target and model
+      on a dialy grain.

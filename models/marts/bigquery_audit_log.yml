@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: dim_job_table_view_references
+    description: All of the unique tables and views that have been queried
+
+    columns:
+      - name: referenced_view_or_table
+        description: The table or view being referenced
+
+      - name: object_type
+        description: Whether the object being referenced is a table or view
+
+      - name: job_id
+        description: Id of the job/query
+
+      - name: job_key
+        description: >
+          Foreign key for dim_job - surrogate of job_id
+        tests:
+          - not_null
+  
+  - name: dim_bigquery_users
+    description: Tracks user_key to principal_email
+
+    columns:
+      - name: user_key
+        description: Surrogate key off principal_email
+        tests:
+          - not_null
+          - unique
+    
+      - name: principal_email
+        description: User email initiating bigquery job
+
+      - name: username
+        description: String that comes before the "@" in the email
+
+      - name: user_type
+        description: Whether the user is a service account or a real user
+
+  - name: dim_user_agents
+    description: Houses user agents and clients that are connecting to bigquery
+
+    columns:
+      - name: user_agent_key
+        description: Surrogate key - built from caller_supplied_user_agent
+        tests:
+          - not_null
+          - unique
+    
+      - name: caller_supplied_user_agent
+        description: user agent supplied with the job
+
+      - name: client_type
+        description: Translated client type, determined from the user agent and pincipal email
+
+  - name: dim_error_messages
+    description: Houses error codes and messages
+
+    columns:
+      - name: error_message_key
+        description: Surrogate key - built from error_result_code and error_result_message
+      
+      - name: error_result_code
+        description: The Warehouse's code used to describe the error
+
+      - name: error_result_message
+        description: The Warehouse's error message
+
+  - name: dim_job_labels
+    description: Houses label keys, values, and job ids
+
+    columns:
+      - name: job_key
+        description: >
+          Foreign key for dim_job - surrogate of job_id
+        tests:
+          - not_null
+
+      - name: label_key
+        description: Key from the label key/value pair
+
+      - name: label_value
+        description: Value from the label key/value pair
+
+  - name: dim_job
+    description: >
+      Houses information on job and query info as well as dbt execution info.
+
+  - name: fct_executed_statements
+    description: >
+      Has keys for jobs, error messages, users, and user_agents, as well as
+      some info around usage and billing.

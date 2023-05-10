@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: int_dbt_execution_info
+    description: ""
+
+  - name: int_threat_calculation
+    description: ""
+
+  - name: int_importance_calculation
+    description: ""
+
+  - name: int_table_active_users
+    description: ""

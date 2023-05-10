@@ -1,0 +1,74 @@
+name: 'leaner_query'
+version: '1.0.0'
+config-version: 2
+
+require-dbt-version: [">=1.3.0", "<2.0.0"]
+
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+docs-paths: ["docs"]
+
+target-path: "target"
+clean-targets:
+    - "target"
+    - "dbt_packages"
+
+models:
+  leaner_query:    
+    +schema: leaner_query
+    +tags:
+      - leaner_query
+
+    marts:
+      materialized: table
+
+    reports:
+      materialized: table
+
+    staging:
+      materialized: view
+
+    intermediate:
+      +materialized: table
+
+    utils:
+      materialized: ephemeral
+
+
+vars:
+  leaner_query_priority_threat_level_weight: .65
+  leaner_query_priority_importance_level_weight: .35
+  leaner_query_weight_threat__service_account_egress: 0.35
+  leaner_query_weight_threat__cost_to_query: 0.30
+  leaner_query_weight_threat__cost_to_build: 0.25
+  leaner_query_weight_threat__daily_errors: 0.10
+  leaner_query_weight_importance__service_account_queries: 0.2 
+  leaner_query_weight_importance__dbt_queries: 0.2
+  leaner_query_weight_importance__egress_use: 0.35
+  leaner_query_weight_importance__user_breadth: 0.25
+
+  leaner_query_require_partition_by_reports: true
+  leaner_query_enable_reports: true
+
+  #Client types
+  leaner_query_importance_query_score_1: ['Web console']
+  leaner_query_importance_query_score_2: ['Connected Sheet - User Initiated', 'Connected Sheet - Scheduled', 'Scheduled Query']
+  leaner_query_importance_query_score_3: []
+  leaner_query_importance_query_score_4: []
+
+  leaner_query_prod_dataset_names: []
+  leaner_query_stage_dataset_names: []
+
+
+  leaner_query_custom_clients: []
+  
+  # principal emails used for egress
+  leaner_query_custom_egress_emails: []  
+
+  leaner_query_bq_on_demand_pricing: 6.225
+  leaner_query_bq_slot_pricing: {'standard': 0.04, 'enterprise': 0.06, 'enterprise_plus' : 0.10}
+  leaner_query_bq_pricing_schedule: on_demand
