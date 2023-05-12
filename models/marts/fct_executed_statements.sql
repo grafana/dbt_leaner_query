@@ -39,8 +39,8 @@ final as (
         output_row_count,
         total_slot_ms,
         billing_tier,
-        if(error_result_code is null, 'NONE', error_result_code) as error_result_code,
-        if(error_result_message is null, 'NONE', error_result_message) as error_result_message,
+        coalesce(error_result_code, 'NONE') as error_result_code,
+        coalesce(error_result_message, 'NONE') as error_result_message,
         job_id,
         principal_email,
         caller_supplied_user_agent
