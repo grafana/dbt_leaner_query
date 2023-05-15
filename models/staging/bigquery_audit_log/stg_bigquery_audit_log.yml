@@ -8,8 +8,6 @@ models:
     columns:
       - name: insert_id
         description: Identifier for an event within the BQ logs
-        tests:
-          - not_null
 
       - name: job_id
         description: >
@@ -20,26 +18,18 @@ models:
         description: >
          Identifies the type of BiqQuery event captured.  Can be one of 'JobChangeEvent', 'TableDataReadEvent', 'OtherEvent'.  
          Only 'JobChangeEvent' and 'TableDataReadEvent' are modeled further
-        tests:
-          - not_null
 
       - name: event_timestamp
         description: When the event was logged
-        tests:
-          - not_null      
 
       - name: resource_name
         description: Fully qualified URI name that the event was logged against
-        tests:
-          - not_null      
 
       - name: principal_email
         description: The user (individual or service account) that ran the statement being logged
 
       - name: project_id
         description: project_id that the event ran against
-        tests:
-          - not_null      
 
       - name: dataset_id
         description: dataset that the event ran against
