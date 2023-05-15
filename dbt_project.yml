@@ -2,8 +2,6 @@ name: 'leaner_query'
 version: '1.0.0'
 config-version: 2
 
-profile: 'leaner_query'
-
 require-dbt-version: [">=1.3.0", "<2.0.0"]
 
 target-path: "target"
