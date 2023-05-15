@@ -92,6 +92,11 @@ models:
   - name: dim_job
     description: >
       Houses information on job and query info as well as dbt execution info.
+    columns:
+      - name: job_key
+        description: Foreign key for dim_job - surrogate of job_id
+        tests:
+          - not_null
 
   - name: fct_executed_statements
     description: >

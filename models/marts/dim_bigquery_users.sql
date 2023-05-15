@@ -1,7 +1,8 @@
 {{ 
     config(
+        unique_key = 'user_key',
         cluster_by = ['user_type', 'user_key'],
-        materialized = 'incremental'
+        materialized = 'incremental',
     )
 }}
 
@@ -20,7 +21,7 @@ user_emails as (
     from source
 )
 
-select
+select distinct
     principal_email,
     regexp_extract(principal_email, '([^@]+)') as username,
     case

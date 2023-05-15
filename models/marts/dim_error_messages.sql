@@ -1,6 +1,7 @@
 {# error messages and code, fill with "NONE" if no error message #}
 {{ 
     config(
+        unique_key = 'error_message_key',
         cluster_by = 'error_message_key',
         materialized='incremental'
 
