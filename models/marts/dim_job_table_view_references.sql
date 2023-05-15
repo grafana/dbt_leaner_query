@@ -1,5 +1,6 @@
 {{ 
     config(
+        unique_key = ['job_key', 'referenced_view_or_table', 'layer_used', 'object_type'],
         cluster_by = ['job_key', 'referenced_view_or_table'],
         materialized = 'incremental'
     )

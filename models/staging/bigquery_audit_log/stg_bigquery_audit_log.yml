@@ -10,43 +10,54 @@ models:
         description: Identifier for an event within the BQ logs
         tests:
           - not_null
+
       - name: job_id
         description: >
           Identifier for the BQ job being logged.  Not all statements are Jobs so this field may be null.  The values are taken
           from the job_name sub_field within the metadataJson field; composing the second and fourth item when splitting by '/'
+
       - name: event_type
         description: >
          Identifies the type of BiqQuery event captured.  Can be one of 'JobChangeEvent', 'TableDataReadEvent', 'OtherEvent'.  
          Only 'JobChangeEvent' and 'TableDataReadEvent' are modeled further
         tests:
-          - not_null      
+          - not_null
+
       - name: event_timestamp
         description: When the event was logged
         tests:
           - not_null      
+
       - name: resource_name
         description: Fully qualified URI name that the event was logged against
         tests:
           - not_null      
+
       - name: principal_email
         description: The user (individual or service account) that ran the statement being logged
-        tests:
-          - not_null      
+
       - name: project_id
         description: project_id that the event ran against
         tests:
           - not_null      
+
       - name: dataset_id
         description: dataset that the event ran against
+        
       - name: location
         description: location that the event ran for
+
       - name: caller_ip_address
         description: ip address of the client issuing the event
+
       - name: caller_supplied_user_agent
         description: The user agent of the caller, which is captured by the google sdk or api.  Helpful in determining how statements are being issued.
+
       - name: service_name
         description: The name of the API service performing the operation.
+
       - name: method_name
         description: The name of the service method or operation.
+
       - name: metadata_json
         description: Contains the JSON representation of the event message

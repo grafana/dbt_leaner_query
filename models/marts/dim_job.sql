@@ -1,6 +1,7 @@
 -- join to dim_job_labels via job_key for labels
 {{ 
     config(
+        unique_key = ['job_key', 'caller_ip_address'],
         cluster_by = ['job_key', 'statement_type'],
         materialized='incremental'
 ) }}

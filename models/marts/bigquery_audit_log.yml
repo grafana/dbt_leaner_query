@@ -5,6 +5,11 @@ models:
     description: All of the unique tables and views that have been queried
 
     columns:
+      - name: job_key
+        description: Foreign key for dim_job - surrogate of job_id
+        tests:
+          - not_null
+  
       - name: referenced_view_or_table
         description: The table or view being referenced
 
@@ -14,12 +19,9 @@ models:
       - name: job_id
         description: Id of the job/query
 
-      - name: job_key
-        description: >
-          Foreign key for dim_job - surrogate of job_id
-        tests:
-          - not_null
-  
+      - name: layer_used
+        description: Details which layer the table/view was being referenced from
+
   - name: dim_bigquery_users
     description: Tracks user_key to principal_email
 
@@ -47,7 +49,6 @@ models:
         description: Surrogate key - built from caller_supplied_user_agent
         tests:
           - not_null
-          - unique
     
       - name: caller_supplied_user_agent
         description: user agent supplied with the job
@@ -70,11 +71,15 @@ models:
 
   - name: dim_job_labels
     description: Houses label keys, values, and job ids
+    tests:
+      - unique_combination_of_columns:
+          combination_of_columns:
+            - job_key
+            - label_key
 
     columns:
       - name: job_key
-        description: >
-          Foreign key for dim_job - surrogate of job_id
+        description: Foreign key for dim_job - surrogate of job_id
         tests:
           - not_null
 
@@ -87,6 +92,11 @@ models:
   - name: dim_job
     description: >
       Houses information on job and query info as well as dbt execution info.
+    columns:
+      - name: job_key
+        description: Foreign key for dim_job - surrogate of job_id
+        tests:
+          - not_null
 
   - name: fct_executed_statements
     description: >

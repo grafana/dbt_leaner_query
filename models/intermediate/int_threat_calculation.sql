@@ -100,7 +100,9 @@ egress_use_counts as (
         on calendar.date_day = base.statement_date
             and date(base.statement_date) > calendar.date_day - 7
     where user_type = 'Service Account'
+    {% if var('leaner_query_custom_egress_emails')| length > 0 -%}
         and principal_email in {{ build_custom_egress_email_list() }}
+    {%- endif -%}
     group by 1,2,3
 
 ),

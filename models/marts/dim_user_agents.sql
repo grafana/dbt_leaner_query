@@ -1,5 +1,6 @@
 {{ 
     config(
+        unique_key = ['user_agent_key', 'client_type'],
         cluster_by = ['user_agent_key', 'client_type'],
         materialized = 'incremental'
     )

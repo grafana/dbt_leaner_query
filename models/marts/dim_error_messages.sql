@@ -1,6 +1,7 @@
 {# error messages and code, fill with "NONE" if no error message #}
 {{ 
     config(
+        unique_key = 'error_message_key',
         cluster_by = 'error_message_key',
         materialized='incremental'
 
@@ -20,8 +21,8 @@ with data_access as (
 error_messages as (
 
     select distinct
-        if(error_result_code is null, 'NONE', error_result_code) as error_result_code,
-        if(error_result_message is null, 'NONE', error_result_message) as error_result_message
+        coalesce(error_result_code, 'NONE') as error_result_code,
+        coalesce(error_result_message, 'NONE') as error_result_message
     from data_access
 
 ),

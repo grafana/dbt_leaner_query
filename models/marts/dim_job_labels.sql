@@ -1,5 +1,6 @@
 {{ 
     config(
+        unique_key = ['job_key', 'label_key'],
         cluster_by = ['job_key', 'label_key'],
         materialized = 'incremental'
     )
