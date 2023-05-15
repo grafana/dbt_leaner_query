@@ -7,7 +7,7 @@
 
 {{ 
     config(
-        cluster_by = ['referenced_view_or_table'],
+        cluster_by = ['table_name'],
         partition_by={
             "field": "score_date",
             "data_type": "date",
