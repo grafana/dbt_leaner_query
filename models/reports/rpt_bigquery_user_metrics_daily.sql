@@ -80,7 +80,7 @@ aggregates as(
     from calendar
     cross join dim_bq_users
     left outer join fct_executed_statements on fct_executed_statements.user_key = dim_bq_users.user_key and fct_executed_statements.statement_date = calendar.date_day
-    left outer join dim_job on fct_executed_statements.job_key = dim_job.job_key and dim_job.statement_type = 'SELECT'
+    left outer join dim_job on fct_executed_statements.job_key = dim_job.job_key and lower(dim_job.statement_type) = 'select'
     left outer join tables_used_per_job on fct_executed_statements.job_key = tables_used_per_job.job_key
     group by 1,2, 3
 ),

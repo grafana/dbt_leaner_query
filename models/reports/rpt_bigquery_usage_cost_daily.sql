@@ -57,8 +57,8 @@ aggregates as (
         coalesce(sum(if(dim_job.dbt_execution_type = "DBT_RUN",{{ calc_bq_cost('total_billed_bytes', 'total_slot_ms') }},0)), 0) as total_estimated_dbt_run_build_cost_usd,
         coalesce(sum(if(dim_job.dbt_execution_type = "DBT_TEST",{{ calc_bq_cost('total_billed_bytes', 'total_slot_ms') }},0)), 0) as total_estimated_dbt_test_build_cost_usd,
         coalesce(sum(fct_executed_statements.total_slot_ms), 0) as total_time_ms,
-        coalesce(sum(if(dim_job.statement_type = "Select",{{ calc_bq_cost('total_billed_bytes', 'total_slot_ms') }},0)), 0) as total_estimated_query_cost_usd,
-        coalesce(sum(if(dim_job.statement_type = "Select", fct_executed_statements.total_slot_ms, 0)), 0) as total_query_time_ms
+        coalesce(sum(if(lower(dim_job.statement_type) = "select",{{ calc_bq_cost('total_billed_bytes', 'total_slot_ms') }},0)), 0) as total_estimated_query_cost_usd,
+        coalesce(sum(if(lower(dim_job.statement_type) = "select", fct_executed_statements.total_slot_ms, 0)), 0) as total_query_time_ms
     from calendar
     cross join dim_user_agents
     left outer join fct_executed_statements
