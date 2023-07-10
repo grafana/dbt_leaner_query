@@ -61,6 +61,7 @@ select
     ]) }} as user_key,
 {{ generate_surrogate_key([
         'caller_supplied_user_agent'
+        , 'principal_email'
     ]) }} as user_agent_key,
     * except(error_result_code,
         error_result_message,

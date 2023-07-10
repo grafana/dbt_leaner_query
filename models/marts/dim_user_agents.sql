@@ -18,7 +18,12 @@ with source as(
 final as(
     select distinct
         caller_supplied_user_agent,
+        principal_email,
         case
+            {% for custom_client in var('leaner_query_custom_clients') %}
+{{ build_client_type(custom_client) }}
+            {% endfor %}
+
             when json_extract_scalar(config_labels, '$.sheets_trigger') = 'user'
                 then 'Connected Sheet - User Initiated'
             when json_extract_scalar(config_labels, '$.sheets_trigger') = 'schedule'
@@ -41,12 +46,8 @@ final as(
             when caller_supplied_user_agent like 'gcloud-node%' then 'Node Client'
             when caller_supplied_user_agent like 'SimbaJDBCDriver%' then 'Java Client'
             when caller_supplied_user_agent = '(gzip),gzip(gfe)'
-                and principal_email = 'stemma-ai%'
+                and principal_email like 'stemma-ai%'
                 then 'Stemma Crawler'
-
-            {% for custom_client in var('leaner_query_custom_clients') %}
-{{ build_client_type(custom_client) }}
-            {% endfor %}
 
             else coalesce(caller_supplied_user_agent, 'Unknown')
         end as client_type
@@ -54,6 +55,6 @@ final as(
 )
 
 select
-{{ generate_surrogate_key(['caller_supplied_user_agent']) }} as user_agent_key,
+{{ generate_surrogate_key(['caller_supplied_user_agent', 'principal_email']) }} as user_agent_key,
     *
 from final
