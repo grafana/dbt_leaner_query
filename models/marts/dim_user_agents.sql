@@ -45,9 +45,8 @@ final as(
                 then 'Golang Client'
             when caller_supplied_user_agent like 'gcloud-node%' then 'Node Client'
             when caller_supplied_user_agent like 'SimbaJDBCDriver%' then 'Java Client'
-            when caller_supplied_user_agent = '(gzip),gzip(gfe)'
-                and principal_email like 'stemma-ai%'
-                then 'Stemma Crawler'
+            when caller_supplied_user_agent like 'google-cloud-sdk%' 
+                then 'Google Cloud SDK'
 
             else coalesce(caller_supplied_user_agent, 'Unknown')
         end as client_type
