@@ -79,6 +79,10 @@ aggregates as (
     select
         calendar.date_day as report_date, -- calendar
         unique_tables.table_name, -- dim_job_table
+        unique_tables.project_id,
+        unique_tables.dataset_id,
+        unique_tables.table_or_view_id,
+        concat(unique_tables.project_id, '.', unique_tables.dataset_id, '.', unique_tables.table_or_view_id) as qualified_table_name,
         dim_job_table_view_references.layer_used as layer, -- dim_job_table
         dim_user_agents.client_type, -- dim_user_agents
         coalesce(count(fct_executed_statements.job_key), 0) as total_queries_run,  -- cnt(job_key) from fct_executed_statements
