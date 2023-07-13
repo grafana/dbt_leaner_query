@@ -53,7 +53,7 @@ object_split as (
 
 add_layer as(
     select *,
-        concat(dim_job_table_view_references.project_id, '.', unique_tables.dataset_id, '.', unique_tables.table_or_view_id) as  qualified_table_name,
+        concat(project_id, '.', dataset_id, '.', table_or_view_id) as  qualified_table_name,
         {{ determine_data_layer('dataset_id') }} as layer_used
     from object_split
 )
