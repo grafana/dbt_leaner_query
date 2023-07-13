@@ -86,9 +86,6 @@ renamed as (
             '$.jobChange.job.jobConfig.queryConfig.priority') as query_priority,
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
             '$.jobChange.job.jobConfig.queryConfig.statementType') as statement_type,
-    --  split(destination_table, "/")[safe_offset(1)] as destination_project_id,
-    --     split(destination_table, "/")[safe_offset(3)] as destination_dataset_id,
-    --     split(destination_table, "/")[safe_offset(5)] as destination_table_id
     from source
     where JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.jobChange') is not null
 )

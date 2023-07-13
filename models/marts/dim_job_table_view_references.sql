@@ -19,7 +19,6 @@ views as (
     select distinct
         job_id,
         referenced_view as referenced_view_or_table,
-        {{ determine_data_layer('referenced_view') }} as layer_used,
         "view" as object_type
     from source
     cross join unnest(referenced_views) as referenced_view
@@ -29,7 +28,6 @@ tables as (
     select distinct
         job_id,
         referenced_table as referenced_view_or_table,
-        {{ determine_data_layer('referenced_table') }} as layer_used,
         "table" as object_type
     from source
     cross join unnest(referenced_tables) as referenced_table
@@ -43,6 +41,21 @@ unioned as (
 
     select *
     from tables
+),
+
+object_split as (
+    select *,
+        split(referenced_view_or_table, '/')[safe_offset(1)] as project_id,
+        split(referenced_view_or_table, '/')[safe_offset(3)] as dataset_id,
+        split(referenced_view_or_table, '/')[safe_offset(5)] as table_or_view_id
+    from unioned
+),
+
+add_layer as(
+    select *,
+        concat(project_id, '.', dataset_id, '.', table_or_view_id) as  qualified_table_name,
+        {{ determine_data_layer('dataset_id') }} as layer_used
+    from object_split
 )
 
 select distinct
@@ -50,4 +63,4 @@ select distinct
         'job_id'
     ]) }} as job_key,
     * except(job_id)
-from unioned
+from add_layer
