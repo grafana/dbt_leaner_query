@@ -105,7 +105,7 @@ aggregates as (
         on fct_executed_statements.user_key = dim_bq_users.user_key
     left outer join dim_job
         on fct_executed_statements.job_key = dim_job.job_key
-    group by 1, 2, 3, 4
+    group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 
 final as (
