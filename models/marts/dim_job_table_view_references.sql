@@ -27,7 +27,7 @@ views as (
 tables as (
     select distinct
         job_id,
-        referenced_table as referenced_view_or_table
+        referenced_table as referenced_view_or_table,
         "table" as object_type
     from source
     cross join unnest(referenced_tables) as referenced_table
@@ -45,9 +45,9 @@ unioned as (
 
 object_split as (
     select *,
-        split(referenced_table, '/')[safe_offset(1)] as project_id,
-        split(referenced_table, '/')[safe_offset(3)] as dataset_id,
-        split(referenced_table, '/')[safe_offset(5)] as table_or_view_id
+        split(referenced_view_or_table, '/')[safe_offset(1)] as project_id,
+        split(referenced_view_or_table, '/')[safe_offset(3)] as dataset_id,
+        split(referenced_view_or_table, '/')[safe_offset(5)] as table_or_view_id
     from unioned
 ),
 
