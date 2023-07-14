@@ -61,7 +61,8 @@ dim_job_table_view_references as(
 ),
 
 unique_tables as (
-    select distinct referenced_view_or_table as table_name
+    select 
+        distinct referenced_view_or_table as table_name
     from dim_job_table_view_references
 ),
 
@@ -79,6 +80,10 @@ aggregates as (
     select
         calendar.date_day as report_date, -- calendar
         unique_tables.table_name, -- dim_job_table
+        dim_job_table_view_references.project_id,
+        dim_job_table_view_references.dataset_id,
+        dim_job_table_view_references.table_or_view_id,
+        dim_job_table_view_references.qualified_table_name,
         dim_job_table_view_references.layer_used as layer, -- dim_job_table
         dim_user_agents.client_type, -- dim_user_agents
         coalesce(count(fct_executed_statements.job_key), 0) as total_queries_run,  -- cnt(job_key) from fct_executed_statements
@@ -100,7 +105,7 @@ aggregates as (
         on fct_executed_statements.user_key = dim_bq_users.user_key
     left outer join dim_job
         on fct_executed_statements.job_key = dim_job.job_key
-    group by 1, 2, 3, 4
+    group by 1, 2, 3, 4, 5, 6, 7, 8
 ),
 
 final as (
