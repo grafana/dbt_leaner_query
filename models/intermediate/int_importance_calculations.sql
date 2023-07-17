@@ -41,6 +41,7 @@ calendar as (
 dim_table_view_references as(
     select *
     from {{ ref('dim_job_table_view_references') }}
+    where object_type = 'table' 
 ),
 
 dim_bq_users as(
@@ -63,36 +64,60 @@ int_table_active_users as(
     from {{ ref('int_table_active_users') }}
 ),
 
+base as (
+
+    select
+        statement_date,
+        fct_executed_statements.job_key,
+        dim_table_view_references.referenced_view_or_table,
+        dim_table_view_references.layer_used,
+        dim_bq_users.user_key,
+        dim_bq_users.principal_email,
+        dim_bq_users.user_type,
+        fct_executed_statements.user_agent_key,
+        fct_executed_statements.total_billed_bytes,
+        fct_executed_statements.total_slot_ms
+    from fct_executed_statements
+    inner join dim_table_view_references
+        on fct_executed_statements.job_key = dim_table_view_references.job_key
+    inner join dim_bq_users
+        on fct_executed_statements.user_key = dim_bq_users.user_key
+),
+
+deduped_base as(
+    select 
+        referenced_view_or_table,
+        statement_date
+    from base
+    qualify row_number() over(partition by statement_date, referenced_view_or_table) = 1
+),
+
 daily_service_account_queries as(
     select
-        dim_table_view_references.referenced_view_or_table as ref_table,
+        base.referenced_view_or_table as ref_table,
         calendar.date_day,
-        coalesce(count(fct_executed_statements.job_key), 0) as query_count,
-    from fct_executed_statements
-    left outer join calendar on calendar.date_day = fct_executed_statements.statement_date and date(fct_executed_statements.statement_date) > calendar.date_day - 7
-    inner join dim_table_view_references on fct_executed_statements.job_key = dim_table_view_references.job_key and object_type = 'table'
-    inner join dim_bq_users on fct_executed_statements.user_key = dim_bq_users.user_key
-    where dim_bq_users.user_type = 'Service Account'
+        coalesce(count(base.job_key), 0) as query_count,
+    from base
+    left outer join calendar on calendar.date_day = base.statement_date and date(base.statement_date) > calendar.date_day - 7
+    where base.user_type = 'Service Account'
     group by 1,2
 ),
 
 daily_dbt_queries as(
     select
-        dim_table_view_references.referenced_view_or_table as ref_table,
+        base.referenced_view_or_table as ref_table,
         calendar.date_day,
         coalesce(count(dim_job_labels.label_value),0) as query_count,
-    from fct_executed_statements
-    left outer join calendar on calendar.date_day = fct_executed_statements.statement_date and date(fct_executed_statements.statement_date) > calendar.date_day - 7
-    inner join dim_table_view_references on fct_executed_statements.job_key = dim_table_view_references.job_key and object_type = 'table'
-    inner join dim_bq_users on fct_executed_statements.user_key = dim_bq_users.user_key
-    left outer join dim_job_labels as dim_job_labels on fct_executed_statements.job_key = dim_job_labels.job_key and dim_job_labels.label_key = 'dbt_invocation_id'
-    where dim_bq_users.user_type = 'Service Account'
+    from base
+    left outer join calendar on calendar.date_day = base.statement_date and date(base.statement_date) > calendar.date_day - 7
+    left outer join dim_job_labels as dim_job_labels on base.job_key = dim_job_labels.job_key and dim_job_labels.label_key = 'dbt_invocation_id'
+    where base.user_type = 'Service Account'
     group by 1,2
 ),
 
 daily_egress_use as(
     select
-        dim_table_view_references.referenced_view_or_table as ref_table,
+        base.referenced_view_or_table as ref_table,
         calendar.date_day,
         sum(
             case
@@ -103,12 +128,10 @@ daily_egress_use as(
                 else 0
             end
         ) as query_score
-    from fct_executed_statements
-    left outer join calendar on calendar.date_day = fct_executed_statements.statement_date and date(fct_executed_statements.statement_date) > calendar.date_day - 7
-    inner join dim_table_view_references on fct_executed_statements.job_key = dim_table_view_references.job_key and object_type = 'table'
-    inner join dim_bq_users on fct_executed_statements.user_key = dim_bq_users.user_key
-    inner join dim_user_agents on fct_executed_statements.user_agent_key = dim_user_agents.user_agent_key
-    where dim_bq_users.user_type = 'Service Account'
+    from base
+    left outer join calendar on calendar.date_day = base.statement_date and date(base.statement_date) > calendar.date_day - 7
+    inner join dim_user_agents on base.user_agent_key = dim_user_agents.user_agent_key
+    where base.user_type = 'Service Account'
     group by 1,2
 
 ),
@@ -183,8 +206,8 @@ percent_rank_active_users as(
 
 final as(
     select
-        percent_rank_service_account_queries.ref_table as table_name,
-        percent_rank_service_account_queries.date_day as score_date,
+        deduped_base.referenced_view_or_table as table_name,
+        deduped_base.statement_date as score_date,
         percent_rank_service_account_queries.median_query_count as service_acct_median_queries,
         percent_rank_service_account_queries.perc_rnk as service_acct_percent_rank,
         percent_rank_dbt_queries.median_query_count as dbt_median_queries,
@@ -197,13 +220,15 @@ final as(
           (percent_rank_dbt_queries.perc_rnk * {{ var('leaner_query_weight_importance__dbt_queries') }}) +
           (percent_rank_egress_use.perc_rnk * {{ var('leaner_query_weight_importance__egress_use') }}) +
           (percent_rank_active_users.perc_rnk * {{ var('leaner_query_weight_importance__user_breadth') }})) as importance_score
-    from percent_rank_service_account_queries
-    left outer join percent_rank_dbt_queries on percent_rank_service_account_queries.ref_table = percent_rank_dbt_queries.ref_table
-        and percent_rank_service_account_queries.date_day = percent_rank_dbt_queries.date_day
-    left outer join percent_rank_egress_use on percent_rank_service_account_queries.ref_table = percent_rank_egress_use.ref_table
-        and percent_rank_service_account_queries.date_day = percent_rank_egress_use.date_day
-    left outer join percent_rank_active_users on percent_rank_service_account_queries.ref_table = percent_rank_active_users.ref_table
-        and percent_rank_service_account_queries.date_day = percent_rank_active_users.date_day
+    from deduped_base
+    left outer join percent_rank_service_account_queries on deduped_base.referenced_view_or_table = percent_rank_service_account_queries.ref_table
+        and deduped_base.statement_date = percent_rank_service_account_queries.date_day
+    left outer join percent_rank_dbt_queries on deduped_base.referenced_view_or_table = percent_rank_dbt_queries.ref_table
+        and deduped_base.statement_date = percent_rank_dbt_queries.date_day
+    left outer join percent_rank_egress_use on deduped_base.referenced_view_or_table = percent_rank_egress_use.ref_table
+        and deduped_base.statement_date = percent_rank_egress_use.date_day
+    left outer join percent_rank_active_users on deduped_base.referenced_view_or_table = percent_rank_active_users.ref_table
+        and deduped_base.statement_date = percent_rank_active_users.date_day
 
 )
 
