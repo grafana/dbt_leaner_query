@@ -63,14 +63,20 @@ base as (
         if(statements.error_message_key = {{ generate_surrogate_key(["'NONE'", "'NONE'"]) }}, false, true) as is_errored,
         jobs.dbt_execution_type
     from statements
-    inner join jobs
-        on statements.job_key = jobs.job_key
     inner join table_refs
-        on jobs.job_key = table_refs.job_key
+        on statements.job_key = table_refs.job_key
+    left outer join jobs
+        on statements.job_key = jobs.job_key
     inner join users
         on statements.user_key = users.user_key
-    order by 1,2
+),
 
+deduped_base as(
+    select 
+        referenced_view_or_table,
+        statement_date
+    from base
+    qualify row_number() over(partition by statement_date, referenced_view_or_table) = 1
 ),
 
 min_event_date as (
@@ -237,8 +243,8 @@ percent_rank_daily_errors as (
 joined as (
 
     select
-        base.referenced_view_or_table,
-        base.statement_date,
+        deduped_base.referenced_view_or_table,
+        deduped_base.statement_date,
         coalesce(egress.count_queries_with_multiplier, 0) as count_queries_with_multiplier,
         coalesce(egress.percent_rank_count_queries_with_multiplier, 0) as percent_rank_count_queries_with_multiplier,
         coalesce(cost_query.sum_daily_query_cost_median, 0) as sum_daily_query_cost_median,
@@ -251,19 +257,19 @@ joined as (
             + (coalesce(cost_query.percent_rank_sum_daily_query_cost, 0) * {{ var("leaner_query_weight_threat__cost_to_query") }})
             + (coalesce(cost_build.percent_rank_daily_build_cost, 0) * {{ var("leaner_query_weight_threat__cost_to_build") }})
             + (coalesce(percent_rank_daily_errors, 0) * {{ var("leaner_query_weight_threat__daily_errors") }})) as threat_score
-    from base
+    from deduped_base
     left outer join percent_rank_egress_use as egress
-        on base.referenced_view_or_table = egress.referenced_view_or_table
-           and base.statement_date = egress.date_day
+        on deduped_base.referenced_view_or_table = egress.referenced_view_or_table
+           and deduped_base.statement_date = egress.date_day
     left outer join percent_rank_cost_to_query as cost_query
-        on base.referenced_view_or_table = cost_query.referenced_view_or_table
-           and base.statement_date = cost_query.date_day
+        on deduped_base.referenced_view_or_table = cost_query.referenced_view_or_table
+           and deduped_base.statement_date = cost_query.date_day
     left outer join percent_rank_cost_to_build as cost_build
-        on base.referenced_view_or_table = cost_build.referenced_view_or_table
-           and base.statement_date = cost_build.date_day
+        on deduped_base.referenced_view_or_table = cost_build.referenced_view_or_table
+           and deduped_base.statement_date = cost_build.date_day
     left outer join percent_rank_daily_errors as errors
-        on base.referenced_view_or_table = errors.referenced_view_or_table
-           and base.statement_date = errors.date_day
+        on deduped_base.referenced_view_or_table = errors.referenced_view_or_table
+           and deduped_base.statement_date = errors.date_day
 
 ),
 
