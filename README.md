@@ -19,7 +19,7 @@ This dbt package aims to provide the following details for data teams who are us
 - **[Reports](#reports)**
 - **[Scoring logic](#scoring-logic)**
 - **[Variables](#variables)**
-- **[Visualizaiton](#visualization)**
+- **[Visualization](#visualization)**
 
 ## Getting Started
 - Add any/all variable overrides to your dbt_project.yml file, ie:
