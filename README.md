@@ -19,7 +19,7 @@ This dbt package aims to provide the following details for data teams who are us
 - **[Reports](#reports)**
 - **[Scoring logic](#scoring-logic)**
 - **[Variables](#variables)**
-
+- **[Visualization](#visualization)**
 
 ## Getting Started
 - Add any/all variable overrides to your dbt_project.yml file, ie:
@@ -232,3 +232,7 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 	- **leaner_query_weight_importance__user_breadth** 
 		- **Description**: weight given to the breadth of users querying an object
 		- **Default**: 0.25
+
+### Visualization
+#### Grafana Dashboarding Template
+We have included a template for our Grafana Dashboard that help to track our BQ and dbt costs. You can find the raw JSON in `grafana_dashboard_template.json`. You can easily import this dashboard into any Grafana instance and immediately start visualizing your data - assuming you have the BigQuery Datasource configured.
