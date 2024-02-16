@@ -1,15 +1,7 @@
-{% set partitions_to_replace = [
-    'date(date_add(current_date, interval -3 day))',
-    'date(date_add(current_date, interval -2 day))',
-    'date(date_add(current_date, interval -1 day))',
-    'date(current_date)'
-] %}
-
 {{ 
     config(
         unique_key = ['job_key', 'caller_ip_address'],
         cluster_by = ['job_key', 'statement_type'],
-
         materialized='incremental'
 ) }}
 
