@@ -1,4 +1,3 @@
--- join to dim_job_labels via job_key for labels
 {{ 
     config(
         unique_key = ['job_key', 'caller_ip_address'],
@@ -31,7 +30,6 @@ dbt_statements as(
         json_extract_scalar(dbt_info, '$.target_name') as dbt_target_name,
         json_extract_scalar(dbt_info, '$.node_id') as dbt_model_name
     from extract_json
-    where length(extract_json.dbt_info) > 0
 ),
 
 add_dbt_context as(
@@ -69,7 +67,8 @@ final as (
         dbt_profile_name,
         dbt_target_name,
         dbt_execution_type,
-        dbt_adjusted_model_name as dbt_model_name
+        dbt_adjusted_model_name as dbt_model_name,
+        cache_hit
     from adjust_modelname
 )
 
