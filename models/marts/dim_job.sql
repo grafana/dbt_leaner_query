@@ -1,8 +1,15 @@
--- join to dim_job_labels via job_key for labels
+{% set partitions_to_replace = [
+    'date(date_add(current_date, interval -3 day))',
+    'date(date_add(current_date, interval -2 day))',
+    'date(date_add(current_date, interval -1 day))',
+    'date(current_date)'
+] %}
+
 {{ 
     config(
         unique_key = ['job_key', 'caller_ip_address'],
         cluster_by = ['job_key', 'statement_type'],
+
         materialized='incremental'
 ) }}
 
@@ -31,7 +38,6 @@ dbt_statements as(
         json_extract_scalar(dbt_info, '$.target_name') as dbt_target_name,
         json_extract_scalar(dbt_info, '$.node_id') as dbt_model_name
     from extract_json
-    where length(extract_json.dbt_info) > 0
 ),
 
 add_dbt_context as(
@@ -69,7 +75,8 @@ final as (
         dbt_profile_name,
         dbt_target_name,
         dbt_execution_type,
-        dbt_adjusted_model_name as dbt_model_name
+        dbt_adjusted_model_name as dbt_model_name,
+        cache_hit
     from adjust_modelname
 )
 
