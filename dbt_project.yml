@@ -57,7 +57,7 @@ vars:
 
   leaner_query_prod_dataset_names: []
   leaner_query_stage_dataset_names: []
-  leaner_query_dev_dataset_names: []
+  leaner_query_dev_target_name: ''
 
 
   leaner_query_custom_clients: []
