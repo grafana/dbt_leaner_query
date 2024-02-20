@@ -21,8 +21,12 @@
 with fct_executed_statements as (
     select *
     from {{ ref('fct_executed_statements') }}
+    where 1=1
     {% if is_incremental() %}
-      where date(statement_date) >= current_date - 3
+        and date(statement_date) >= current_date - 3
+    {% endif %}
+    {% if target.name == var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
+        and date(statement_date) >= current_date - var('leaner_query_dev_limit_days')
     {% endif %}
 ),
 
