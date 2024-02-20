@@ -37,8 +37,12 @@ calendar as (
     select date_day
     from {{ ref('dim_leaner_query_date') }}
     inner join min_event_date on date_day between min_date and current_date
+    where 1=1
     {% if is_incremental() %}
-    where date_day >= {{ partitions_to_replace[0] }}
+        and date_day >= {{ partitions_to_replace[0] }}
+    {% endif %}
+    {% if target.name in var('leaner_query_dev_dataset_names') and var('leaner_query_enable_dev_limits') %}
+        and date_day >= current_date - var('leaner_query_dev_limit_days')
     {% endif %}
 
 ),

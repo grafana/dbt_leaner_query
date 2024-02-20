@@ -9,8 +9,12 @@
 with source as (
     select *
     from {{ ref('stg_bigquery_audit_log__data_access') }}
+    where 1=1
     {% if is_incremental() %}
-      where date(event_timestamp) >= current_date - 3
+        and date(event_timestamp) >= current_date - 3
+    {% endif %}
+    {% if target.name in var('leaner_query_dev_dataset_names') and var('leaner_query_enable_dev_limits') %}
+        and date(event_timestamp) >= current_date - var('leaner_query_dev_limit_days')
     {% endif %}
 
 ),
