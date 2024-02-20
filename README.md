@@ -187,6 +187,15 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 	"client_name": "sample_custom_client_name"
 }
 ```
+- **leaner_query_enable_dev_limits**
+	- **Description**: This is used to limit the incremental builds in a dev environment so you aren't doing a full refresh during development and CI.
+	- **Default**: true
+- **leaner_query_dev_limit_days**
+	- **Description**: Used in conjunction with `leaner_query_enable_dev_limits`, this determines how many days back you want to have your incremental models build in dev.
+	- **Default**: 30
+- **leaner_query_dev_target_name**
+	- **Description**: The name of your target dev environment.
+	- **Default**: ""
   ### Reporting
 - **leaner_query_priority_threat_level_weight** 
 	- **Description**: weight given to the threat report score
