@@ -195,7 +195,7 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 	- **Default**: 30
 - **leaner_query_dev_target_name**
 	- **Description**: The name of your target dev environment.
-	- **Default**: ""
+	- **Default**: "dev"
   ### Reporting
 - **leaner_query_priority_threat_level_weight** 
 	- **Description**: weight given to the threat report score
