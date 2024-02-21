@@ -17,7 +17,7 @@ with data_access as (
         and date(event_timestamp) >= current_date - 3
     {% endif %}
     {% if target.name == var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
-        and date(event_timestamp) >= current_date - var('leaner_query_dev_limit_days')
+        and date(event_timestamp) >= current_date - {{ var('leaner_query_dev_limit_days') }}
     {% endif %}
 
 ),
