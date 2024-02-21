@@ -36,7 +36,7 @@ calendar as (
         and date_day >= {{ partitions_to_replace[0] }}
     {% endif %}
     {% if target.name == var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
-        and date_day >= current_date - var('leaner_query_dev_limit_days')
+        and date_day >= current_date - {{ var('leaner_query_dev_limit_days') }}
     {% endif %}
 
 ),
