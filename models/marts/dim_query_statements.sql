@@ -25,40 +25,12 @@ extract_json as(
     from data_access
 ),
 
-dbt_statements as(
-    select
-        *,
-        json_extract_scalar(dbt_info, '$.dbt_version') as dbt_version,
-        json_extract_scalar(dbt_info, '$.profile_name') as dbt_profile_name,
-        json_extract_scalar(dbt_info, '$.target_name') as dbt_target_name,
-        json_extract_scalar(dbt_info, '$.node_id') as dbt_model_name
-    from extract_json
-),
-
-add_dbt_context as(
-    select
-        *,
-        case
-            when dbt_model_name like 'model.%' then 'DBT_RUN'
-            when dbt_model_name like 'snapshot.%' then 'DBT_SNAPSHOT'
-            when dbt_model_name like 'test.%' then 'DBT_TEST'
-        end as dbt_execution_type
-    from dbt_statements
-),
-
-adjust_modelname as(
-    select
-        *,
-        concat(split(dbt_model_name, '.')[safe_offset(1)], '.',split(dbt_model_name, '.')[safe_offset(2)]) as dbt_adjusted_model_name
-    from add_dbt_context
-),
-
 final as (
     select distinct
         query_statement,
         job_id,
         dbt_info,
-    from adjust_modelname
+    from extract_json
 )
 
 select 
