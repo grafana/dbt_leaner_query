@@ -1,6 +1,6 @@
 {{ 
     config(
-        cluster_by = ['job_key', 'dashboard_id', 'panel_id'],
+        cluster_by = ['job_key', 'query_statement'],
         materialized = 'incremental'
 ) }}
 
@@ -54,30 +54,16 @@ adjust_modelname as(
 ),
 
 final as (
-
     select distinct
-        dashboard_id,
-        panel_id,
+        query_statement,
         job_id,
-        event_type,
-        resource_name,
-        caller_ip_address,
-        method_name,
-        create_disposition,
-        statement_type,
-        query_priority,
-        dbt_version,
-        dbt_profile_name,
-        dbt_target_name,
-        dbt_execution_type,
-        dbt_adjusted_model_name as dbt_model_name,
-        cache_hit
+        dbt_info,
     from adjust_modelname
 )
 
-select
+select 
 {{ generate_surrogate_key ([
-        'job_id'
-    ]) }} as job_key,
+    'job_id',
+])}} as job_key,
     *
 from final
