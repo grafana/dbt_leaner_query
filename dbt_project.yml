@@ -50,7 +50,7 @@ vars:
   leaner_query_enable_dev_limits: true
 
   leaner_query_dev_limit_days: 30
-  leaner_query_dev_target_name: 'dev'
+  leaner_query_dev_target_name: ['dev']
 
   #Client types
   leaner_query_importance_query_score_1: ['Web console']

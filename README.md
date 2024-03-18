@@ -58,6 +58,7 @@ The package outputs a dimensional model that allows users to build upon for cust
 - **dim_job_labels**: bridge-type table that contains label keys and values for jobs
 - **dim_job_table_view_references**: combination of all tables and views ever referenced in the BQ audit logs along with which layer they are a part of.  The layer classification uses the values set in the  `leaner_query_prod_dataset_names` and `leaner_query_stage_dataset_names` variables. 
 - **dim_jobs**: details about every BQ job executed, including parsed and normalized dbt metadata that is sent to BQ.
+- **dim_query_statements**: essentially just `query_statements` and `dbt_info` for each given BQ job. This was originally all part of `dim_jobs`, but was broken out as it's not used often and accounsted for a majority of the size of the table.
 - **dim_user_agents**: parsed and classified caller_supplied_user_agent details, defined as a `client_type`.  The classification logic can be seen below and is augmented by values added to the `leaner_query_custom_clients` variable.
 - **fct_executed_statements**: BQ job execution event data including output rows, slot_ms, processed_bytes, billed_bytes, etc.
 #### Client type classification logic:

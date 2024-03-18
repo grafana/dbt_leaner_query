@@ -51,3 +51,9 @@ models:
 
       - name: metadata_json
         description: Contains the JSON representation of the event message
+
+      - name: grafana_dashboard_id
+        description: The id of the grafana dashboard where the bigquery job was run
+
+      - name: grafana_panel_id
+        description: The id of the grafana panel where the bigquery job was run

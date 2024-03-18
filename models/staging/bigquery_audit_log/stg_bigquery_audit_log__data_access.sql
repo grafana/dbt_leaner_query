@@ -7,6 +7,8 @@ with source as (
 renamed as (
     select
         insertId as insert_id,
+        JSON_EXTRACT(protopayload_auditlog.metadataJson, "$.jobChange.job.jobConfig.labels.x-dashboard-uid") as grafana_dashboard_id,
+        JSON_EXTRACT(protopayload_auditlog.metadataJson, "$.jobChange.job.jobConfig.labels.x-panel-id") as grafana_panel_id,
         COALESCE(
             CONCAT(
                 SPLIT(

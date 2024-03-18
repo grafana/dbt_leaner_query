@@ -1,8 +1,8 @@
 {{ 
     config(
         unique_key = ['job_key', 'caller_ip_address'],
-        cluster_by = ['job_key', 'statement_type'],
-        materialized='incremental'
+        cluster_by = ['job_key', 'dashboard_id', 'panel_id'],
+        materialized = 'incremental'
 ) }}
 
 with data_access as (
@@ -13,7 +13,7 @@ with data_access as (
     {% if is_incremental() %}
         and date(event_timestamp) >= current_date - 3
     {% endif %}
-    {% if target.name == var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
+    {% if target.name in var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
         and date(event_timestamp) >= current_date - {{ var('leaner_query_dev_limit_days') }}
     {% endif %}
 
@@ -57,16 +57,16 @@ adjust_modelname as(
 final as (
 
     select distinct
-        event_type,
+        grafana_dashboard_id,
+        grafana_panel_id,
         job_id,
+        event_type,
         resource_name,
         caller_ip_address,
         method_name,
         create_disposition,
-        query_statement,
         statement_type,
         query_priority,
-        dbt_info,
         dbt_version,
         dbt_profile_name,
         dbt_target_name,

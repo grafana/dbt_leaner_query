@@ -26,9 +26,9 @@ with statements as (
     from {{ ref('fct_executed_statements') }}
     where 1=1
     {% if is_incremental() %}
-        and date(statement_date) >= current_date - 3
+        and timestamp(statement_date) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
-    {% if target.name == var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
+    {% if target.name in var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
         and date(statement_date) >= current_date - {{ var('leaner_query_dev_limit_days') }}
     {% endif %}
 ),
@@ -38,9 +38,9 @@ users as (
     from {{ ref('dim_bigquery_users') }}
 ),
 
-jobs as (
+query_statements as (
     select *
-    from {{ ref('dim_job') }}
+    from {{ ref('dim_query_statements') }}
 ),
 
 final as (
@@ -49,12 +49,12 @@ final as (
         users.username,
         users.user_type,
         {{calc_bq_cost('total_billed_bytes', 'total_slot_ms')}} as query_cost,
-        jobs.query_statement
+        query_statements.query_statement
     from statements
     inner join users
         on users.user_key = statements.user_key
-    inner join jobs
-        on jobs.job_key = statements.job_key
+    inner join query_statements
+        on query_statements.job_key = statements.job_key
     where date(statements.start_time) >= current_date -2
 )
 
