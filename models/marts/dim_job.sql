@@ -1,7 +1,7 @@
 {{ 
     config(
         unique_key = ['job_key', 'caller_ip_address'],
-        cluster_by = ['job_key', 'dashboard_id', 'panel_id'],
+        cluster_by = ['job_key', 'grafana_dashboard_id', 'grafana_panel_id'],
         materialized = 'incremental'
 ) }}
 
