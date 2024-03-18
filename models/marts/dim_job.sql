@@ -56,8 +56,8 @@ adjust_modelname as(
 final as (
 
     select distinct
-        dashboard_id,
-        panel_id,
+        grafana_dashboard_id,
+        grafana_panel_id,
         job_id,
         event_type,
         resource_name,
