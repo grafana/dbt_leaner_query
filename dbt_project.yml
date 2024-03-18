@@ -34,8 +34,6 @@ models:
 
 
 vars:
-  leaner_query_database: 'grafanalabs-global'
-
   leaner_query_priority_threat_level_weight: .65
   leaner_query_priority_importance_level_weight: .35
   leaner_query_weight_threat__service_account_egress: 0.35
