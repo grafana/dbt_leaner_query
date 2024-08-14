@@ -98,7 +98,7 @@ models:
         tests:
           - not_null
 
-  - name: dim_query_statement
+  - name: dim_query_statements
     description: >
       Houses query statements at a job level.
     columns:
