@@ -4,9 +4,9 @@ This is a dbt package built to help teams that use BigQuery understand their cos
 
 This package uses [BigQuery Audit](https://cloud.google.com/logging/docs/reference/audit/bigquery/rest/Shared.Types/AuditData) Log data and assumes that a log sink is set up to export the logs into tables in a BigQuery dataset.  If you are unfamiliar with how to accomplish this, visit this Google cloud [resource](https://cloud.google.com/blog/products/data-analytics/bigquery-audit-logs-pipelines-analysis).
 
-This package assumes that the user(s) executing the processes have read access to the bigquery log dataset referenced above and write access to the dataset where leaner_query is creating/updating objects.
+This package assumes that the user(s) executing the processes have read access to the BigQuery log dataset referenced above and write access to the dataset where LeanerQuery is creating/updating objects.
 
-The package contains a lot of variable values to determine costs, aggregation, and scoring.  You will want to override/specify some of these values in your dbt_project.yml file as your details and use cases are undoubtedly different than ours.  More details in the [variables](#variables) section.
+The package contains a lot of variable values to determine costs, aggregation, and scoring.  You will want to override/specify some of these values in your `dbt_project.yml` file as your details and use cases are undoubtedly different than ours.  More details in the [variables](#variables) section.
 
 This dbt package aims to provide the following details for data teams who are using BigQuery:
 - costs associated with queries and dbt builds
@@ -22,7 +22,7 @@ This dbt package aims to provide the following details for data teams who are us
 - **[Visualization](#visualization)**
 
 ## Getting Started
-- Add any/all variable overrides to your dbt_project.yml file, ie:
+- Add any/all variable overrides to your `dbt_project.yml` file, e.g.:
 ```YML
 leaner_query_database: my_gcp_project
 leaner_query_importance_query_score_3: ['My BI Tool']
@@ -30,6 +30,9 @@ leaner_query_importance_query_score_4: ['My reverse ETL tool']
 
 leaner_query_prod_dataset_names: ['marts','reports']
 leaner_query_stage_dataset_names: ['staging_models']
+leaner_query_database: ['generic-bigquery-project', 'other-generic-bigquery-project']
+leaner_query_source_schema: ['audit_dataset']
+leaner_query_data_access_table: ['audit_table']
 
 leaner_query_custom_clients: [
 {'user_agent': 'agent_string', 'principal_email':'username', 'client_name':'Custom Client 1'},
@@ -39,9 +42,14 @@ leaner_query_custom_clients: [
 leaner_query_custom_egress_emails: [
 'egress_sa@your-project.iam.gserviceaccount.com',
 'another_sa@your-project.iam.gserviceaccount.com',
-]  
+]
 ```
-- Optionally update your dbt_project.yml file to override the dataset where the leaner_query models will be built (defaults to `leaner-query`):
+- Run `leaner_query_setup.py`, located at the root directory of the package. This populates `./dbt_packages/leaner_query/models/staging/bigquery_audit_log/src_bigquery_audit_log.yml` with values from the `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` variables that you've input. The script assumes a typical dbt installation, and looks for `dbt_project.yml` at root of your dbt repo.
+    - **If you have added any of the `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` variables, this step MUST be completed! This change was introduced in version 0.2.0.**
+    - If you haven't added `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` as variables and you're okay with using default values, you do **not** have to run this step.
+    - If you modify `models/staging/bigquery_aduit_log/stg_bigquery_audit_log__data_access.sql`, please copy/paste the text from the `source` CTE to the end of the file into `stg_bigquery_audit_log__data_access_query_text.txt`. This text file is used in `leaner_query_setup.py.`
+
+- Optionally update your dbt_project.yml file to override the dataset where the leaner_query models will be built (defaults to `leaner_query`):
 ```YML
 leaner_query:
     +schema: leaner_query_output
@@ -146,13 +154,13 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 ## Variables
 ### General purpose
 - **leaner_query_database** 
-	- **Description**: database (project) where the bigquery audit logs reside.
+	- **Description**: database (project) where the bigquery audit logs reside. Multiple projects may be used: input as a list.
 	- **Default**: target.database
 - **leaner_query_source_schema** 
-	- **Description**: schema (dataset) where the bigquery audit logs reside.
+	- **Description**: schema (dataset) where the bigquery audit logs reside. Input as a list, in the same order as projects you've inputted. `leaner_query_setup.py` will return an error if you have more values in this list than in `leaner_query_database`. If all of your values match the default value below, you do not need this variable.
 	- **Default**: bigquery_audit_logs
 - **leaner_query_data_access_table** 
-	- **Description**: tablename where the bigquery data access audit logs reside.
+	- **Description**: table name where the bigquery data access audit logs reside. Input as a list, in the same order as projects you've inputted. `leaner_query_setup.py` will return an error if you have more values in this list than in `leaner_query_database`. If all of your values match the default value below, you do not need this variable.
 	- **Default**: leaner_query_data_access_table
 - **leaner_query_enable_reports** 
 	- **Description**: enable report models listed above.
@@ -161,7 +169,7 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 	- **Description**: enable requiring the use of partitions when querying report tables.
 	- **Default**: true
 - **leaner_query_prod_dataset_names** 
-	- **Description**: a list of dataset names that are considered production (ie marts and reporting tables), meant for consumption by users and other systems.
+	- **Description**: a list of dataset names that are considered production (e.g. marts and reporting tables), meant for consumption by users and other systems.
 	- **Default**: [] (None)
 - **leaner_query_stage_dataset_names** 
 	- **Description**: a list of dataset names that are considered staging and are not meant for consumption by users and other systems; used by dbt to build production models.

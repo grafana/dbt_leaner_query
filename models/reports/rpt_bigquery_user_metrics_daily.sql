@@ -73,6 +73,7 @@ aggregates as(
         calendar.date_day as report_date,
         dim_bq_users.username,
         dim_bq_users.user_type,
+        dim_bq_users.project_id,
         coalesce(count(fct_executed_statements.job_key), 0) as total_queries_run,
         coalesce(sum(case when fct_executed_statements.error_message_key !={{ generate_surrogate_key(["'NONE'", "'NONE'"]) }} then 1 else 0 end), 0) as total_errors,
         coalesce(sum(prod_tables_used), 0) as total_prod_tables_used,
@@ -86,7 +87,7 @@ aggregates as(
     left outer join fct_executed_statements on fct_executed_statements.user_key = dim_bq_users.user_key and fct_executed_statements.statement_date = calendar.date_day
     left outer join dim_job on fct_executed_statements.job_key = dim_job.job_key and lower(dim_job.statement_type) = 'select'
     left outer join tables_used_per_job on fct_executed_statements.job_key = tables_used_per_job.job_key
-    group by 1,2, 3
+    group by 1, 2, 3, 4
 ),
 
 final as(

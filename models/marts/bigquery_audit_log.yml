@@ -40,6 +40,9 @@ models:
 
       - name: user_type
         description: Whether the user is a service account or a real user
+      
+      - name: project_id
+        description: BQ project associated with the user ID.
 
   - name: dim_user_agents
     description: Houses user agents and clients that are connecting to bigquery
