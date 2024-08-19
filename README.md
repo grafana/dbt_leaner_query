@@ -45,7 +45,7 @@ leaner_query_custom_egress_emails: [
 ]
 ```
 - Run `leaner_query_setup.py`, located at the root directory of the package. This populates `./dbt_packages/leaner_query/models/staging/bigquery_audit_log/src_bigquery_audit_log.yml` with values from the `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` variables that you've input. The script assumes a typical dbt installation, and looks for `dbt_project.yml` at root of your dbt repo.
-    - **If you have added any of the `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` variables, this step MUST be completed! This change was introduced in version 0.2.0.**
+    - **If you have added any of the `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` variables, even with just one project, this step MUST be completed! Please ensure any values in these variables are in a list (`[]`). This change was introduced in version 0.2.0.**
     - If you haven't added `leaner_query_database`, `leaner_query_source_schema`, and `leaner_query_data_access_table` as variables and you're okay with using default values, you do **not** have to run this step.
     - If you modify `models/staging/bigquery_aduit_log/stg_bigquery_audit_log__data_access.sql`, please copy/paste the text from the `source` CTE to the end of the file into `stg_bigquery_audit_log__data_access_query_text.txt`. This text file is used in `leaner_query_setup.py.`
 
