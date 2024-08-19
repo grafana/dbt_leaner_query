@@ -27,12 +27,13 @@ user_emails as (
 
 select distinct
     principal_email,
+    project_id,
     regexp_extract(principal_email, '([^@]+)') as username,
     case
         when principal_email like '%.iam.gserviceaccount.com' then 'Service Account'
         else 'User'
     end as user_type,
 {{ generate_surrogate_key([
-        'principal_email'
+        'principal_email', 'project_id'
     ]) }} as user_key
 from user_emails

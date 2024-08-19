@@ -47,6 +47,7 @@ final as (
         coalesce(error_result_message, 'NONE') as error_result_message,
         job_id,
         principal_email,
+        project_id,
         caller_supplied_user_agent
     from source
 
@@ -61,7 +62,8 @@ select
         , 'error_result_message'
     ]) }} as error_message_key,
 {{ generate_surrogate_key([
-        'principal_email'
+        'principal_email',
+        'project_id'
     ]) }} as user_key,
 {{ generate_surrogate_key([
         'caller_supplied_user_agent'
@@ -71,5 +73,6 @@ select
         error_result_message,
         job_id,
         principal_email,
+        project_id,
         caller_supplied_user_agent)
 from final

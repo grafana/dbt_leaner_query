@@ -1,15 +1,3 @@
--- if you change anything in this file, please copy everything from line 11 on (`source CTE` -> EOF)
--- into `stg_bigquery_audit_log__data_access_query_text.txt` in this same folder. If you don't and run
--- `leaner_query_setup.py`, you will not see the changes to this staging file in your model.
-
-with unioned as (
-    {{ union_relations(
-        relations=[
-                source('bq_audit_default_project', 'cloudaudit_googleapis_com_data_access'),
-        ]
-    ) }}
-),
-
 source as (
 
     select * except (_dbt_source_relation)

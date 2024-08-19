@@ -56,6 +56,7 @@ aggregates as (
     select
         calendar.date_day as report_date, -- calendar
         dim_user_agents.client_type, -- dim_user_agents
+        dim_user_agents.project_id, -- BQ project name
         coalesce(count(fct_executed_statements.job_key), 0) as total_queries_run,  -- cnt(job_key) from fct_executed_statements
         coalesce(sum({{ calc_bq_cost('total_billed_bytes', 'total_slot_ms') }}), 0) as total_estimated_cost_usd,
         coalesce(sum(if(dim_job.dbt_execution_type = "DBT_RUN",{{ calc_bq_cost('total_billed_bytes', 'total_slot_ms') }},0)), 0) as total_estimated_dbt_run_build_cost_usd,
@@ -70,7 +71,7 @@ aggregates as (
             and calendar.date_day = fct_executed_statements.statement_date
     left outer join dim_job
         on fct_executed_statements.job_key = dim_job.job_key
-    group by 1, 2
+    group by 1, 2, 3
 )
 
 select *
