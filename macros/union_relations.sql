@@ -2,8 +2,31 @@
 -- This macro is used in one of the models in LeanerQuery: this is to ensure you're able to run the model
 -- License for this is here: https://github.com/dbt-labs/dbt-utils?tab=Apache-2.0-1-ov-file
 
+{% macro _is_ephemeral(obj, macro) %}
+    {%- if obj.is_cte -%}
+        {% set ephemeral_prefix = api.Relation.add_ephemeral_prefix('') %}
+        {% if obj.name.startswith(ephemeral_prefix) %}
+            {% set model_name = obj.name[(ephemeral_prefix|length):] %}
+        {% else %}
+            {% set model_name = obj.name %}
+        {%- endif -%}
+        {% set error_message %}
+The `{{ macro }}` macro cannot be used with ephemeral models, as it relies on the information schema.
+
+`{{ model_name }}` is an ephemeral model. Consider making it a view or table instead.
+        {% endset %}
+        {%- do exceptions.raise_compiler_error(error_message) -%}
+    {%- endif -%}
+{% endmacro %}
+
+{% macro _is_relation(obj, macro) %}
+    {%- if not (obj is mapping and obj.get('metadata', {}).get('type', '').endswith('Relation')) -%}
+        {%- do exceptions.raise_compiler_error("Macro " ~ macro ~ " expected a Relation but received the value: " ~ obj) -%}
+    {%- endif -%}
+{% endmacro %}
+
 {%- macro union_relations(relations, column_override=none, include=[], exclude=[], source_column_name='_dbt_source_relation', where=none) -%}
-    {{ return(adapter.dispatch('union_relations', 'dbt_utils')(relations, column_override, include, exclude, source_column_name, where)) }}
+    {{ return(adapter.dispatch('union_relations')(relations, column_override, include, exclude, source_column_name, where)) }}
 {% endmacro %}
 
 {%- macro default__union_relations(relations, column_override=none, include=[], exclude=[], source_column_name='_dbt_source_relation', where=none) -%}
@@ -40,8 +63,8 @@
 
         {%- do relation_columns.update({relation: []}) -%}
 
-        {%- do dbt_utils._is_relation(relation, 'union_relations') -%}
-        {%- do dbt_utils._is_ephemeral(relation, 'union_relations') -%}
+        {%- do _is_relation(relation, 'union_relations') -%}
+        {%- do _is_ephemeral(relation, 'union_relations') -%}
         {%- set cols = adapter.get_columns_in_relation(relation) -%}
         {%- for col in cols -%}
 
