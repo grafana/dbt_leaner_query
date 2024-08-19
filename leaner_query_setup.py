@@ -134,7 +134,7 @@ def read_txt_file(filename: str) -> str:
 def generate_header(bq_config_list):
     stg_model_sql_header_part_one = """
 with unioned as (
-    {{ dbt_utils.union_relations( 
+    {{ union_relations( 
         relations=[
 """
     stg_model_sql_header_part_two = """
