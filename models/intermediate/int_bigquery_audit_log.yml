@@ -1,13 +1,10 @@
 version: 2
 
 models:
-  - name: int_dbt_execution_info
-    description: ""
-
   - name: int_threat_calculation
     description: ""
 
-  - name: int_importance_calculation
+  - name: int_importance_calculations
     description: ""
 
   - name: int_table_active_users
