@@ -60,6 +60,7 @@ final as (
         grafana_dashboard_id,
         grafana_panel_id,
         job_id,
+        project_id,
         event_type,
         resource_name,
         caller_ip_address,

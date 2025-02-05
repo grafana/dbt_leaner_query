@@ -61,7 +61,6 @@ vars:
   leaner_query_prod_dataset_names: []
   leaner_query_stage_dataset_names: []
 
-
   leaner_query_custom_clients: []
   
   # principal emails used for egress

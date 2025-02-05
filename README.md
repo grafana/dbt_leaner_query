@@ -4,9 +4,9 @@ This is a dbt package built to help teams that use BigQuery understand their cos
 
 This package uses [BigQuery Audit](https://cloud.google.com/logging/docs/reference/audit/bigquery/rest/Shared.Types/AuditData) Log data and assumes that a log sink is set up to export the logs into tables in a BigQuery dataset.  If you are unfamiliar with how to accomplish this, visit this Google cloud [resource](https://cloud.google.com/blog/products/data-analytics/bigquery-audit-logs-pipelines-analysis).
 
-This package assumes that the user(s) executing the processes have read access to the bigquery log dataset referenced above and write access to the dataset where leaner_query is creating/updating objects.
+This package assumes that the user(s) executing the processes have read access to the BigQuery log dataset referenced above and write access to the dataset where LeanerQuery is creating/updating objects.
 
-The package contains a lot of variable values to determine costs, aggregation, and scoring.  You will want to override/specify some of these values in your dbt_project.yml file as your details and use cases are undoubtedly different than ours.  More details in the [variables](#variables) section.
+The package contains a lot of variable values to determine costs, aggregation, and scoring.  You will want to override/specify some of these values in your `dbt_project.yml` file as your details and use cases are undoubtedly different than ours.  More details in the [variables](#variables) section.
 
 This dbt package aims to provide the following details for data teams who are using BigQuery:
 - costs associated with queries and dbt builds
@@ -22,9 +22,12 @@ This dbt package aims to provide the following details for data teams who are us
 - **[Visualization](#visualization)**
 
 ## Getting Started
-- Add any/all variable overrides to your dbt_project.yml file, ie:
+- New for 0.2.0 and a required variable: add BQ audit log source variable to your `dbt_project.yml` file. Format of this variable is a list of fully-qualified table names, including project, dataset, and table. By default, Google/BigQuery places audit logs in your project's `bigquery_audit_logs` dataset and `cloudaudit_googleapis_com_data_access` table. You may still use only one project - please maintain the same format as below, please, but with one entry. Additional examples in the [variables](#variables) section.
 ```YML
-leaner_query_database: my_gcp_project
+leaner_query_sources: ["`project_id.dataset_id.table_id`", "`project_id_2.dataset_id_2.table_id_2`"]
+```
+- Add any/all variable overrides to your `dbt_project.yml` file:
+```YML
 leaner_query_importance_query_score_3: ['My BI Tool']
 leaner_query_importance_query_score_4: ['My reverse ETL tool']
 
@@ -35,13 +38,15 @@ leaner_query_custom_clients: [
 {'user_agent': 'agent_string', 'principal_email':'username', 'client_name':'Custom Client 1'},
 {'user_agent': 'agent_string', 'principal_email':'different_username', 'client_name':'Custom Client 2'},
 ]
-  
+
 leaner_query_custom_egress_emails: [
 'egress_sa@your-project.iam.gserviceaccount.com',
 'another_sa@your-project.iam.gserviceaccount.com',
-]  
+]
 ```
-- Optionally update your dbt_project.yml file to override the dataset where the leaner_query models will be built (defaults to `leaner-query`):
+
+
+- Optional: update your dbt_project.yml file to override the dataset where the leaner_query models will be built (defaults to `leaner_query`):
 ```YML
 leaner_query:
     +schema: leaner_query_output
@@ -145,15 +150,13 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 ``` 
 ## Variables
 ### General purpose
-- **leaner_query_database** 
-	- **Description**: database (project) where the bigquery audit logs reside.
-	- **Default**: target.database
-- **leaner_query_source_schema** 
-	- **Description**: schema (dataset) where the bigquery audit logs reside.
-	- **Default**: bigquery_audit_logs
-- **leaner_query_data_access_table** 
-	- **Description**: tablename where the bigquery data access audit logs reside.
-	- **Default**: leaner_query_data_access_table
+- **leaner_query_sources**
+    - **Description**: fully-scoped table name of where in BigQuery the audit logs you wish to query are stored. This can either be a single project or multiple, depending on your needs. Format must be a list, with fully-qualified tables quoted and back-ticked.
+    - **Default**: none: you must enter a value for LeanerQuery to function.
+    - **Example**: 
+      - Single project: ["\`example-corp-bq.bigquery_audit_logs.cloudaudit_googleapis_com_data_access\`"]
+      - Multiple projects: ["\`example-corp-bq.bigquery_audit_logs.cloudaudit_googleapis_com_data_access\`", "\`example-corp-bq-two.bigquery_audit_logs.cloudaudit_googleapis_com_data_access\`", "\`example-corp-bq-three.bigquery_audit_logs.cloudaudit_googleapis_com_data_access\`"]
+
 - **leaner_query_enable_reports** 
 	- **Description**: enable report models listed above.
 	- **Default**: true
@@ -161,7 +164,7 @@ Priorizing where to spend precious refactoring and refinement time is difficult 
 	- **Description**: enable requiring the use of partitions when querying report tables.
 	- **Default**: true
 - **leaner_query_prod_dataset_names** 
-	- **Description**: a list of dataset names that are considered production (ie marts and reporting tables), meant for consumption by users and other systems.
+	- **Description**: a list of dataset names that are considered production (e.g. marts and reporting tables), meant for consumption by users and other systems.
 	- **Default**: [] (None)
 - **leaner_query_stage_dataset_names** 
 	- **Description**: a list of dataset names that are considered staging and are not meant for consumption by users and other systems; used by dbt to build production models.
