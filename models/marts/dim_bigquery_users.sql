@@ -21,7 +21,9 @@ with source as (
 ),
 
 user_emails as (
-    select distinct principal_email,
+    select distinct
+        principal_email,
+        project_id
     from source
 )
 
