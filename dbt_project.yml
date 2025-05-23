@@ -18,19 +18,19 @@ models:
       - leaner_query
 
     marts:
-      materialized: table
+      +materialized: table
 
     reports:
-      materialized: table
+      +materialized: table
 
     staging:
-      materialized: view
+      +materialized: view
 
     intermediate:
       +materialized: table
 
     utils:
-      materialized: ephemeral
+      +materialized: ephemeral
 
 
 vars:
