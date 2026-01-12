@@ -9,7 +9,7 @@ models:
         description: Foreign key for dim_job - surrogate of job_id
         tests:
           - not_null
-  
+
       - name: referenced_view_or_table
         description: The table or view being referenced
 
@@ -31,7 +31,7 @@ models:
         tests:
           - not_null
           - unique
-    
+
       - name: principal_email
         description: User email initiating bigquery job
 
@@ -40,7 +40,7 @@ models:
 
       - name: user_type
         description: Whether the user is a service account or a real user
-      
+
       - name: project_id
         description: BQ project associated with the user ID.
 
@@ -52,7 +52,7 @@ models:
         description: Surrogate key - built from caller_supplied_user_agent
         tests:
           - not_null
-    
+
       - name: caller_supplied_user_agent
         description: user agent supplied with the job
 
@@ -65,7 +65,7 @@ models:
     columns:
       - name: error_message_key
         description: Surrogate key - built from error_result_code and error_result_message
-      
+
       - name: error_result_code
         description: The Warehouse's code used to describe the error
 
@@ -76,9 +76,10 @@ models:
     description: Houses label keys, values, and job ids
     tests:
       - unique_combination_of_columns:
-          combination_of_columns:
-            - job_key
-            - label_key
+          arguments:
+            combination_of_columns:
+              - job_key
+              - label_key
 
     columns:
       - name: job_key
