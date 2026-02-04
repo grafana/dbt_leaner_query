@@ -76,6 +76,7 @@ models:
     description: Houses label keys, values, and job ids
     tests:
       - unique_combination_of_columns:
+        arguments:
           combination_of_columns:
             - job_key
             - label_key
