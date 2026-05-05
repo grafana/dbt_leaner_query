@@ -1,0 +1,12 @@
+leaner_query:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: YOUR_GCP_PROJECT_ID
+      dataset: leaner_query
+      location: US
+      threads: 4
+      priority: interactive
+

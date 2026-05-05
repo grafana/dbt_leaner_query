@@ -1,9 +1,4 @@
-{% set partitions_to_replace = [
-    'timestamp(timestamp_add(current_timestamp, interval -3 day))',
-    'timestamp(timestamp_add(current_timestamp, interval -2 day))',
-    'timestamp(timestamp_add(current_timestamp, interval -1 day))',
-    'timestamp(current_timestamp)'
-] %}
+{% set partitions_to_replace = leaner_query_partitions_to_replace('timestamp') %}
 
 {{
     config(
@@ -55,7 +50,7 @@ final as (
         on users.user_key = statements.user_key
     inner join query_statements
         on query_statements.job_key = statements.job_key
-    where date(statements.start_time) >= current_date -2
+    where {{ leaner_query_microbatch_where('statements.start_time', 'date') }}
 )
 
 select *

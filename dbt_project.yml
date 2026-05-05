@@ -4,7 +4,7 @@ config-version: 2
 
 profile: 'leaner_query'
 
-require-dbt-version: [">=1.3.0", "<2.0.0"]
+require-dbt-version: [">=1.11.0", "<2.0.0"]
 
 target-path: "target"
 clean-targets:
@@ -51,6 +51,11 @@ vars:
 
   leaner_query_dev_limit_days: 30
   leaner_query_dev_target_name: ['dev']
+
+  # Microbatch controls for audit-log/query-history derived models
+  # - Example: set to 30 to (re)build last 30 days each run
+  leaner_query_microbatch_days: 3
+  leaner_query_microbatch_include_today: true
 
   #Client types
   leaner_query_importance_query_score_1: ['Web console']

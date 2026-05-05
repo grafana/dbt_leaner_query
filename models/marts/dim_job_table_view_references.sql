@@ -11,7 +11,7 @@ with source as (
     from {{ ref('stg_bigquery_audit_log__data_access') }}
     where 1=1
     {% if is_incremental() %}
-        and date(event_timestamp) >= current_date - 3
+        and {{ leaner_query_microbatch_where('event_timestamp', 'date') }}
     {% endif %}
     {% if target.name in var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
         and date(event_timestamp) >= current_date - {{ var('leaner_query_dev_limit_days') }}

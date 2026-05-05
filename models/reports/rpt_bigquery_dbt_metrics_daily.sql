@@ -1,9 +1,4 @@
-{% set partitions_to_replace = [
-    'date(date_add(current_date, interval -3 day))',
-    'date(date_add(current_date, interval -2 day))',
-    'date(date_add(current_date, interval -1 day))',
-    'date(current_date)'
-] %}
+{% set partitions_to_replace = leaner_query_partitions_to_replace('date') %}
 
 {{ 
     config(
