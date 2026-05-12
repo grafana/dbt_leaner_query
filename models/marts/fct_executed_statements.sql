@@ -1,9 +1,4 @@
-{% set partitions_to_replace = [
-    'date(date_add(current_date, interval -3 day))',
-    'date(date_add(current_date, interval -2 day))',
-    'date(date_add(current_date, interval -1 day))',
-    'date(current_date)'
-] %}
+{% set partitions_to_replace = leaner_query_partitions_to_replace('date') %}
 
 {{ 
     config(
@@ -24,7 +19,7 @@ with source as (
     from {{ ref('stg_bigquery_audit_log__data_access') }}
     where 1=1
     {% if is_incremental() %}
-        and date(event_timestamp) >= current_date - 3
+        and date(event_timestamp) in ({{ partitions_to_replace | join(',') }})
     {% endif %}
     {% if target.name in var('leaner_query_dev_target_name') and var('leaner_query_enable_dev_limits') %}
         and date(event_timestamp) >= current_date - {{ var('leaner_query_dev_limit_days') }}
