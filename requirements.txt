@@ -3,5 +3,5 @@
 
 dbt-bigquery==1.3.0
 sqlfluff==1.4.2
-sqlfluff-templater-dbt==1.4.2
+sqlfluff-templater-dbt==4.3.0
 diff-cover==7.2.0
