@@ -7,7 +7,7 @@
 
 {{ 
     config(
-        enable = var("leaner_query_enable_reports"),
+        enabled = var("leaner_query_enable_reports"),
         require_partition_filter = var("leaner_query_require_partition_by_reports"),
         partition_by = {
         "field": "report_date",
